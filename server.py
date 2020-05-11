@@ -1,15 +1,19 @@
+import os
 from flask import Flask, url_for, request, render_template, json, redirect, make_response, session, abort, jsonify
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session, users, chats, comment
-import os
+from flask_restful import Api
+import users_resource
+import chats_resource
+import comment_resource
 
 # создаём наше приложение
 app = Flask(__name__)
-# api = Api(app)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 login_manager = LoginManager()
@@ -199,5 +203,15 @@ def register():
 
 if __name__ == '__main__':
     db_session.global_init("db/forum.sqlite")
+
+    api.add_resource(users_resource.UsersListResource, '/api/v1/users')
+    api.add_resource(users_resource.UsersResource, '/api/v1/users/<int:user_id>')
+
+    api.add_resource(chats_resource.ChatsListResource, '/api/v1/chats')
+    api.add_resource(chats_resource.ChatsResource, '/api/v1/chats/<int:chats_id>')
+
+    api.add_resource(comment_resource.CommentListResource, '/api/v1/comment')
+    api.add_resource(comment_resource.CommentResource, '/api/v1/comment/<int:comment_id>')
+
     port = int(os.environ.get("PORT", 5000))
     app.run(host='127.0.0.1', port=port)
