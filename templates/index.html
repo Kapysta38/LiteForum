@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+<h1>Привет, {{ current_user.name }}!</h1>
+{% else %}
+<h1>Привет, скорее регистрируйся и заходи!</h1>
+{% endif %}
+{% endblock %}d
