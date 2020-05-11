@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form class="chats_form">
+<h1 align="h3 mb-3 font-weight-normal">{{title}}
+  </h1>
+    {% for item in comm %}
+  <div class="alert alert-info" role="alert">
+  <label align="h3 mb-3 font-weight-normal">Автор: {{item.author}}</label>
+</div>
+  <table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="row">{{item.text}}</th>
+    </tr>
+  </thead>
+</table><div class="alert alert-secondary" role="alert">
+  Дата: {{item.created_date}}
+</div>
+  {% endfor %}
+  {% if (current_user.is_authenticated and (not(is_private) or current_user.id == author_id)) %}
+<a href="/comment/{{id_chat}}" class="btn btn-secondary">Добавить комментарий</a>
+
+{% endif %}
+    </form>
+{% endblock %}
