@@ -14,6 +14,12 @@
 <header>
     <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand" href="/"><h1 class="text-white">LiteForum</h1></a>
+        {% if show_search %}
+        <form class="form-inline mt-2 mt-md-0" method="post">
+        {{ main_form.text_search(class="form-control mr-sm-2", type="text")}}
+        {{ main_form.submit(type="submit", class="btn btn-outline-success my-2 my-sm-0")}}
+        </form>
+        {% endif %}
         {% if current_user.is_authenticated %}
         <p>
         <a class="navbar-brand" >{{ current_user.name }}</a>

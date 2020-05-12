@@ -52,6 +52,12 @@ class CommentForm(FlaskForm):
     submit = SubmitField('Добавить комментарий')
 
 
+class SearchForm(FlaskForm):
+    """Форма поиска"""
+    text_search = StringField()
+    submit = SubmitField('Поиск')
+
+
 @app.errorhandler(404)
 def not_found(error):
     """Обработчик ошибки 404"""
@@ -134,15 +140,16 @@ def register():
 @app.route('/', methods=['GET', 'POST'])
 def chats_list():
     """Обработчик главной страницы с чатами"""
+    main_form = SearchForm()
     if request.method == "GET":
         new_session = db_session.create_session()
         get_chats = new_session.query(chats.Chats).all()
-        return render_template('chats.html', chats=get_chats, title='LiteForum',
+        return render_template('chats.html', chats=get_chats, title='LiteForum', main_form=main_form, show_search=True,
                                css_file=url_for('static', filename='css/style.css'))
     elif request.method == "POST":
         new_session = db_session.create_session()
-        get_chats = new_session.query(chats.Chats).filter(chats.Chats.title.like('%Новый форум 3%'))
-        return render_template('chats.html', chats=get_chats, title='LiteForum',
+        get_chats = new_session.query(chats.Chats).filter(chats.Chats.title.like(f'%{main_form.text_search.data}%'))
+        return render_template('chats.html', chats=get_chats, title='LiteForum', main_form=main_form, show_search=True,
                                css_file=url_for('static', filename='css/style.css'))
 
 
