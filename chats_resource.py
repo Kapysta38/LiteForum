@@ -2,7 +2,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from data import db_session, chats, comment
 from flask import jsonify
 
-
+# Парсер для проверки аргументов
 parser = reqparse.RequestParser()
 parser.add_argument('title', required=True)
 parser.add_argument('is_private', required=True, type=bool)
@@ -10,6 +10,7 @@ parser.add_argument('user_id', required=True, type=int)
 
 
 def abort_if_user_not_found(chats_id):
+    """Функиця для обработки несуществующих чатов"""
     session = db_session.create_session()
     user = session.query(chats.Chats).get(chats_id)
     if not user:
@@ -18,6 +19,7 @@ def abort_if_user_not_found(chats_id):
 
 class ChatsResource(Resource):
     def get(self, chats_id):
+        """GET-запрос для получения информации об 1 чате с id=chats_id"""
         abort_if_user_not_found(chats_id)
         session = db_session.create_session()
         chat = session.query(chats.Chats).get(chats_id)
@@ -25,6 +27,7 @@ class ChatsResource(Resource):
             only=('id', 'title', 'is_private', 'user_id', 'created_date'))})
 
     def delete(self, chats_id):
+        """DELETE-запрос для удаления чата с id=chats_id"""
         abort_if_user_not_found(chats_id)
         session = db_session.create_session()
         chat = session.query(chats.Chats).get(chats_id)
@@ -37,12 +40,14 @@ class ChatsResource(Resource):
 
 class ChatsListResource(Resource):
     def get(self):
+        """GET-запрос для получения информации всех чатов"""
         session = db_session.create_session()
         chat = session.query(chats.Chats).all()
         return jsonify({'chat': [item.to_dict(
             only=('id', 'title', 'is_private', 'user_id', 'created_date')) for item in chat]})
 
     def post(self):
+        """POST-запрос для создания чата"""
         args = parser.parse_args()
         session = db_session.create_session()
         check_args = session.query(chats.Chats).filter(chats.Chats.title == args['title']).first()

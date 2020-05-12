@@ -2,7 +2,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from data import db_session, comment, users, chats
 from flask import jsonify
 
-
+# Парсер для проверки аргументов
 parser = reqparse.RequestParser()
 parser.add_argument('author', required=True)
 parser.add_argument('text', required=True)
@@ -10,6 +10,7 @@ parser.add_argument('chat_id', required=True, type=int)
 
 
 def abort_if_user_not_found(comment_id):
+    """Функиця для обработки несуществующих комментариев"""
     session = db_session.create_session()
     user = session.query(comment.Comment).get(comment_id)
     if not user:
@@ -18,6 +19,7 @@ def abort_if_user_not_found(comment_id):
 
 class CommentResource(Resource):
     def get(self, comment_id):
+        """GET-запрос для получения информации об 1 комментарии с id=comment_id"""
         abort_if_user_not_found(comment_id)
         session = db_session.create_session()
         comm = session.query(comment.Comment).get(comment_id)
@@ -25,6 +27,7 @@ class CommentResource(Resource):
             only=('id', 'id_author', 'author', 'text', 'chat_id', 'created_date'))})
 
     def delete(self, comment_id):
+        """DELETE-запрос для удаления коментария с id=comment_id"""
         abort_if_user_not_found(comment_id)
         session = db_session.create_session()
         comm = session.query(comment.Comment).get(comment_id)
@@ -35,12 +38,14 @@ class CommentResource(Resource):
 
 class CommentListResource(Resource):
     def get(self):
+        """GET-запрос для получения информации всех комментариев"""
         session = db_session.create_session()
         comm = session.query(comment.Comment).all()
         return jsonify({'comment': [item.to_dict(
             only=('id', 'id_author', 'author', 'text', 'chat_id', 'created_date')) for item in comm]})
 
     def post(self):
+        """POST-запрос для создания комменатрия"""
         args = parser.parse_args()
         session = db_session.create_session()
         check_args_user = session.query(users.User).filter(users.User.name == args['author']).first()
